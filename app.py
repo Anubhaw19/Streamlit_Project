@@ -17,29 +17,39 @@ if uploaded_file is not None:
     
     # Available columns for selection
     available_columns = transpose_df['column name'].tolist()
+
+    #Auto Select columns based on keywords
+    percentage_keywords = ['%','+/-','change','percent','conv','leverage']
+    currency_keywords = ['sale','ads','aur','revenue','s2d','bopis'] 
+    decimal_keywords = ['upt']
+    number_keywords = ['unit','trans']
+    colvis_keywords = ['measurement','rank']
+    hidden_keywords = ['time','rank','region','district','date']
+
+# [element for element in my_array if any(keyword in element for keyword in currency_keywords)]
     
     # Create multiselect dropdowns for different column types
+    percentage_columns = st.multiselect(
+        'Select percentage columns',
+        options=available_columns,
+        default=[col for col in available_columns if any(keyword in col.lower() for keyword in percentage_keywords)]
+    )
+    
+    available_columns = [col for col in available_columns if col not in percentage_columns]
+
     currency_columns = st.multiselect(
         'Select currency columns',
         options=available_columns,
-        default=[]
+        default=[col for col in available_columns if any(keyword in col.lower() for keyword in currency_keywords) and not any(keyword in col.lower() for keyword in percentage_keywords) ]
     )
     
     # Update available columns
     available_columns = [col for col in available_columns if col not in currency_columns]
     
-    percentage_columns = st.multiselect(
-        'Select percentage columns',
-        options=available_columns,
-        default=[]
-    )
-    
-    available_columns = [col for col in available_columns if col not in percentage_columns]
-    
     numerical_columns = st.multiselect(
         'Select numerical columns',
         options=available_columns,
-        default=[]
+        default=[col for col in available_columns if any(keyword in col.lower() for keyword in number_keywords)]
     )
     
     available_columns = [col for col in available_columns if col not in numerical_columns]
@@ -47,7 +57,7 @@ if uploaded_file is not None:
     decimal_columns = st.multiselect(
         'Select decimal columns',
         options=available_columns,
-        default=[]
+        default=[col for col in available_columns if any(keyword in col.lower() for keyword in decimal_keywords)]
     )
     
     available_columns = [col for col in available_columns if col not in decimal_columns]
@@ -55,15 +65,15 @@ if uploaded_file is not None:
     colvis_columns = st.multiselect(
         'Select colvis columns',
         options=available_columns,
-        default=[]
+        default=[col for col in available_columns if any(keyword in col.lower() for keyword in colvis_keywords)]
     )
     
-    available_columns = [col for col in available_columns if col not in colvis_columns]
+    # available_columns = [col for col in available_columns if col not in colvis_columns]
     
     hidden_columns = st.multiselect(
         'Select hidden columns',
         options=available_columns,
-        default=[]
+        default=[col for col in available_columns if any(keyword in col.lower() for keyword in hidden_keywords)]
     )
     
     # Add selections to the DataFrame for visualization
